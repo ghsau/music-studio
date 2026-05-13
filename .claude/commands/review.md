@@ -53,11 +53,20 @@
 ### 7. 更新 INDEX
 - 该项目行：`status` → `reviewed`、`next_review_due` → 空、`metrics` → 用户给的关键数字摘要（如"播放 5w / 完播 42%"），无数据则填"无数据"
 
-### 8. 提交 git
+### 8. 提交 git（仅 knowledge/ 通用规则部分）
+开源版工作室分流：
+- `songs/` + `notes/*-attribution.md` 在 `.gitignore` 内 → 留本地
+- `knowledge/` 入 git（算子复盘可能更新通用规则，应 commit）
+
 ```
-git add songs/<日期-曲名>/06-review.md songs/INDEX.md knowledge/
-git commit -m "review: <曲名>"
+git add knowledge/
+git diff --cached --quiet && echo "knowledge/ 无变化，跳过 commit" || git commit -m "review: <曲名> — 沉淀通用规则"
 ```
+
+> 若 fork 后改了 .gitignore 让 songs/ 入 git（私人音乐 repo），可加：
+> ```
+> git add songs/<日期-曲名>/06-review.md songs/INDEX.md
+> ```
 
 ### 9. 播报
 - 一行总结：爆点哑点

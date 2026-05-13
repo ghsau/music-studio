@@ -52,11 +52,14 @@
   - **不在此处切换**（切换发生在下一次 `/new-song` 启动时，按 SPEC §4.4）
   - 但提醒用户："这是第 5 首发布。下一次 `/new-song` 时会切到收敛模式"
 
-### 6. 提交 git
-```
-git add songs/
-git commit -m "release: <曲名>"
-```
+### 6. 本地状态保存
+`songs/` 默认 gitignore（开源版工作室作品留本地）。INDEX.md 改动直接落本地文件即可，不 commit。
+
+> Fork 后如果你**改了 .gitignore 让 songs/ 入 git**（你自己的私人音乐 repo），此步可改为：
+> ```
+> git add songs/
+> git commit -m "release: <曲名>"
+> ```
 
 ### 7. 播报
 温和教练风格：
