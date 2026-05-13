@@ -1,0 +1,27 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(*)",
+      "Write(personas/*)",
+      "Write(templates/*)",
+      "Write(knowledge/*)",
+      "Write(songs/**)",
+      "Write(.claude/commands/*)",
+      "Edit(personas/*)",
+      "Edit(templates/*)",
+      "Edit(knowledge/*)",
+      "Edit(songs/**)",
+      "Edit(.claude/commands/*)",
+      "Bash(mkdir:*)",
+      "Bash(ls:*)",
+      "Bash(cp:*)",
+      "Bash(mv:*)",
+      "Bash(date:*)",
+      "Bash(git status:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git log:*)",
+      "Bash(du:*)"
+    ]
+  }
+}

@@ -1,0 +1,42 @@
+.DS_Store
+*.swp
+*.swo
+*~
+.idea/
+.vscode/
+node_modules/
+# Python 编译缓存
+__pycache__/
+*.pyc
+*.pyo
+# 临时下载（用户跑外部工具时可能落地此处）
+*.tmp
+*.crdownload
+*.part
+
+# 个人作品 — 不入开源（你的私人创作目录）
+# music-studio 框架本身可复用，作品保留在本地（或你自己的 private repo）
+# 例外：INDEX.template.md 入 git，作为 fork 后的 bootstrap 模板
+songs/*
+!songs/INDEX.template.md
+
+# 个人复盘归因记录 — 不入开源（具体歌名 / 验证日期 / 数据快照）
+# 通用规则在 knowledge/，本目录装个人案例
+# 例外：README.md 入 git，说明这个目录干什么
+notes/*
+!notes/README.md
+
+# 引用素材分析（外部下载视频 + 抽帧），不入库
+songs/*/assets/refs/
+
+# Playwright / 算子复盘临时目录（SOP 第 10 步会清，这里兜底 ignore）
+.tmp/
+.playwright-mcp/
+
+# Claude Code 本地用户配置（含个人手机号等）
+.claude/settings.local.json
+
+# OS / IDE 通用
+*.log
+.env
+.env.local
