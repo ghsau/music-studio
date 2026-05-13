@@ -1,0 +1,202 @@
+# 歌曲评估框架（老周质量门 SOP）
+
+> 工作室的**评估操作标准**。老周拿任何阶段产物（brief / 词 / Suno prompt / take / 视觉 / 发布包）对照此卡，逐项 binary check + 评分。**用框架取代"感觉"，让判断稳定可重复**。
+>
+> **设计来源**：2026-05-14 用户反馈"老周缺结构性框架导致发挥不稳定"——之前每次都被动响应式修订（V1→V2→V3），换框架后每首歌每阶段产物**主动对照打分**。
+
+## 6 维度评估卡
+
+### A. 题材（concept layer）
+
+| # | 子项 | 检查 | 阶段 |
+|---|---|---|---|
+| A1 | 真实经历锚点 | yes/no（必须 yes 才进 brief；no 时承认 explore） | brief 前 |
+| A2 | 现代具象锚点 vs 抽象概念 | yes（有现代锚点）/ no（抽象） | brief |
+| A3 | 题材稀缺度 | 0-10（同期榜单是否过度同质化） | brief |
+| A4 | 审核风险 | 低 / 中 / 高 | brief |
+| A5 | 画像匹配题材 | yes/no | brief |
+
+**门：A1 = no 时强制承认 explore 模式 + 接受数据弱预期**。A2 = no 时按迟信教训预警。
+
+### B. 歌词（lyrics layer）
+
+| # | 子项 | 检查 | 阶段 |
+|---|---|---|---|
+| B1 | hook ≤ 14 字 | yes/no | 墨九 |
+| B2 | hook 戳度 | 0-10（earworm 强度 + 跟唱性 + 跟参照系 hook 句式一致性） | 墨九 |
+| B3 | punchline 密度 | # 个（0-3 弱 / 4-6 中 / 7+ 强） | 墨九 |
+| B4 | 押韵密度 | Verse 句尾押韵 % | 墨九 |
+| B5 | 句式 vs 画像匹配 | yes/no（古风短句 4+3/4+4，现代叙事允许 11 字） | 墨九 |
+| B6 | 意象类型 vs 画像匹配 | yes/no（国风画像用古典意象 / 现代叙事用现代具象） | 墨九 |
+| B7 | 语意通顺度（§6.50 老 SOP）| 4 类问题任何一处 fail 即回炉 | 老周接墨九 |
+| B8 | 跟同工作室历史歌的重叠度 | < 30% 重叠 = pass | 老周 |
+
+**门：B1+B5+B6+B7 全 yes + B3 ≥ 4 + B8 pass** 才放下游。
+
+### C. 曲风 / 音乐结构（music layer）
+
+| # | 子项 | 检查 | 阶段 |
+|---|---|---|---|
+| C1 | BPM 真实感（非 half-time）| yes/no（half-time feel 实感减半 ⚠️） | 阿声 |
+| C2 | BPM vs 画像区间 | yes/no | 阿声 |
+| C3 | BPM vs 参照系一致性 | yes/no（差 ±15 内）| 阿声 |
+| C4 | **副歌爆发结构**（音区拔高 + 音符密度加大 + Crescendo + Drop）| 4 子项都 yes 才 pass | 阿声 |
+| C5 | Intro 前 8 秒驻足钩子（具体旋律 motif 指令） | yes/no | 阿声 |
+| C6 | 力度结构（Verse soft → PreC build → C peak → B twist → FinalC key change） | 5 段都有差异化指令 | 阿声 |
+| C7 | 编曲层次齐（主乐器 + 鼓 + 弦乐 + Choir + Reverb）| 5 项齐 | 阿声 |
+| C8 | 人声匹配（声线 / 气质 / 戏腔 vs 题材）| yes/no | 阿声 |
+| C9 | Style 字符 ≤ 1000 | yes/no（Suno 硬上限） | 阿声 |
+| C10 | g2p 多音字 + 低频字防御 | 双版本歌词 ✅ | 阿声 + 墨九 |
+
+**门：C1+C4+C5+C6+C7 全 yes 才放跑 Suno**。C2/C3/C8/C9/C10 任一 fail 强制回炉。
+
+### D. 视觉（visual layer）
+
+| # | 子项 | 检查 | 阶段 |
+|---|---|---|---|
+| D1 | AI prompt 防呆 4 规则（NO TEXT / 无 trigger 词 / 无留白指令 / East Asian 锚定）| 4 项全 yes | 青衫 |
+| D2 | 封面气质 vs 歌词气质对应 | yes/no（古风凝练 → 山水画风；现代叙事 → 现代场景）| 青衫 |
+| D3 | 配色 3 色给齐 | yes/no | 青衫 |
+| D4 | 字体方向匹配题材 | yes/no | 青衫 |
+| D5 | 海报版独立 prompt | yes/no | 青衫 |
+| D6 | 封面分辨率 ≥ 1440×1440 | yes/no（check-assets.py 兜底）| 用户跑后 |
+
+**门：D1 全 yes + D2 yes + D6 yes** 才放发布。
+
+### E. 发布包 / 运营（release layer）
+
+| # | 子项 | 检查 | 阶段 |
+|---|---|---|---|
+| E1 | 标题 ≤ 30 字 + hook 衍生 | yes/no | 小汽 |
+| E2 | 简介 ≤ 200 字 + 3 段结构 | yes/no | 小汽 |
+| E3 | 抖音文案 ≠ 汽水简介（口语化）| yes/no | 小汽 |
+| E4 | 置顶评论 2 条（共鸣 + 互动）| yes/no | 小汽 |
+| E5 | 标签 3-5 个 + 画像匹配 | yes/no | 小汽 |
+| E6 | 发布时间对位题材 | yes/no | 小汽 |
+
+**门：全 yes 才放发布**。
+
+### F. 数据预期（data layer，老周预判）
+
+| # | 子项 | 检查 | 阶段 |
+|---|---|---|---|
+| F1 | 锚点强度 → 数据预期 | 高 / 中 / 弱 | 老周接小汽 |
+| F2 | 节令对位 → 时机风险 | 低 / 中 / 高 | 老周 |
+| F3 | 视频依赖 → 不可控度 | 低 / 中 / 高 | 老周 |
+
+**门：F1 = 弱 时强制写到 RUN.md 顶部 "explore 实验歌 不期待数据" 警示**。
+
+## 阈值机制：Benchmark 对标，不凭抽象
+
+> **2026-05-14 升级**：评估卡阈值**必须从该画像 TOP 歌的实测反推**，不凭抽象规则。每个画像至少钉 **3 首 benchmark 歌**，关键指标（BPM / hook 字数 / 押韵密度 / 副歌音区跨度 / 编曲层次）**WebSearch 实测**，写到 `knowledge/styles.md` 每个画像段的「Benchmark」字段。
+
+### 操作 SOP
+
+**评估前老周必走 step 0**：
+1. 读 brief「画像」字段 → 定位画像
+2. 翻 `knowledge/styles.md` 该画像的「Benchmark」字段 → 拿 3 首 TOP 歌的实测数据
+3. **用 benchmark 数据 + 跟参照系一致性**作为评分阈值
+4. 没 benchmark 数据 → **强制 WebSearch 补充**（按 memory feedback_external_first），不允许凭推论打分
+
+### 阈值对标规则
+
+| 维度子项 | 对标方式 |
+|---|---|
+| C1 BPM 真实感 | 跟 benchmark 歌 BPM ±5 内 |
+| C2 BPM 区间 | 跟画像区间 + benchmark 中位数对齐 |
+| C4 副歌爆发结构 | **拿 benchmark 副歌作 reference**（音区跨度大几度、音符密度怎么加大），prompt 至少要表达 ≥ 80% benchmark 力度结构 |
+| C5 Intro 驻足钩子 | benchmark 前 8 秒分析（哪些 motif 抓人 + 复制其结构） |
+| C7 编曲层次齐 | 跟 benchmark 编曲组成对齐（主乐器 + 鼓 + 弦 + Choir + Reverb 都齐）|
+| B2 hook 戳度 | 跟 benchmark hook 句式 + 字数 + 跟唱性对照 |
+| B3 punchline 密度 | benchmark 平均 punchline 数（万疆约 5-6 句，毛不易《消愁》约 4-5 句）|
+| B4 押韵密度 | benchmark 严押率（古风通常 80%+，rap 通常 60%+ + 内韵）|
+
+### 必 pass 子项（不变）
+
+| 维度 | 必 pass 子项 |
+|---|---|
+| A 题材 | A5（画像匹配）一定 pass；A1 = no 时强制承认 explore |
+| B 歌词 | B1 + B5 + B6 + B7 全 yes；B3 ≥ benchmark 中位数；B8（跟历史歌重叠度 <30%） |
+| C 曲风 | **C1（BPM 真实感）+ C4（副歌爆发结构，跟 benchmark 副歌力度结构 ≥80% match）+ C5（Intro 钩子，benchmark 同款 motif 结构）+ C6 + C7（跟 benchmark 编曲层次 ≥80% match）+ C9 + C10 全 yes** |
+| D 视觉 | D1 + D2 + D6 全 yes |
+| E 发布包 | 全 yes |
+| F 数据预期 | 弱预期时 RUN.md 加警示 |
+
+### Benchmark 数据如何获取（必走 SOP）
+
+1. **`/new-song` step 4.45 已 enforce 外部参照系研究** — 每首歌至少 WebSearch 1 首参照
+2. **参照歌的关键数据回填到 styles.md 该画像「Benchmark」字段** — 渐进积累，每首歌跑完后 sync
+3. **每个画像至少 ≥3 首 benchmark** — 单首会偏，多首取中位数稳
+4. **benchmark 90 天重核**（参 styles.md ✅ 生命周期机制） — 听众口味变化导致老 benchmark 失效时，算子降级
+
+### 当前各画像 benchmark 状态（截至 2026-05-14）
+
+| 画像 | Benchmark 进度 | 详见 |
+|---|---|---|
+| guofeng-slow-lyric | 已锁 ≥3 首（万疆 / 周深《光亮》/ 李玉刚《刚好遇见你》），待实测数据回填 | `knowledge/styles.md` 画像 1 |
+| guofeng-pop | 已锁 ≥3 首（周杰伦《青花瓷》/ 林俊杰《江南》/ 周深《元来是这样》），待实测 | 画像 2 |
+| modern-narrative-folk | 已锁 ≥3 首（毛不易《消愁》/ 宋冬野《董小姐》/ 陈鸿宇《理想三旬》），待实测 | 画像 3 |
+| chinese-rap | 已锁 ≥2 首（王以太《别怕变老》144 BPM ✅ 实测 / 周杰伦《听妈妈的话》），待补第 3 首 | 画像 4 |
+| earworm-pop | 已锁 ≥3 首（ROSÉ & Bruno《APT》/ 鞠婧祎《无暇》/ NewJeans），待实测 | 画像 5 |
+
+> **数据实测进度**：目前只有王以太《别怕变老》144 BPM 经 WebSearch 实测（老登 V2 经验）。其他 benchmark 歌的 BPM / 副歌音区跨度 / punchline 密度等实测数据待逐首积累——每跑一首新歌时顺手 WebSearch 补一首 benchmark 的实测数据回填。
+
+## 老周操作 SOP
+
+### 拿到 brief 后
+1. 过 A 段 5 项 + B5/B6（提前看歌词框架是否对位画像）
+2. A1 = no → 警告用户 + 写"explore 实验歌"到 brief 顶部
+3. 全 pass → 放墨九
+
+### 拿到歌词后
+1. 过 B 段 8 项
+2. §6.50 语意通顺度 review 必走
+3. **跟同工作室历史歌做 cross-check**（B8 — 防止意象/结构复刻，参替他们看 V1 跟今潮重叠教训）
+4. 任 1 fail → 给具体改写候选 → 回炉
+5. 全 pass → 放阿声
+
+### 拿到 Suno prompt 后
+1. 过 C 段 10 项
+2. **重点扫 C1 + C4 + C5**（这是历史失败模式集中区 — 老登 V1 BPM 错 / 替他们看 V2 half-time + 副歌爆发结构缺）
+3. C9 字符数实测（Style ≤ 1000）
+4. 全 pass → 让用户跑 Suno
+
+### 拿到 Suno take 后（用户跑完）
+1. 用户回填 02-suno-prompt 生成日志
+2. 老周用 C 段重听：
+   - BPM 实际感觉对吗（C1）
+   - 副歌音区是否拔高（C4）
+   - Intro 前 8 秒抓人吗（C5）
+   - 力度推进对吗（C6）
+   - 编曲层次齐吗（C7）
+3. 任 1 fail → 重跑（最多 3 轮 take，3 轮仍不达标 → stop and pivot 或 explore 接受）
+
+### 拿到视觉 / 发布包后
+1. 过 D + E 段
+2. F 数据预期写到 RUN.md
+
+## 不在评估卡内的（已有 SOP 不重复）
+
+- 歌词修订下游 audit（老周 §6 已有 SOP）
+- 复盘数据归因追源（memory feedback_review_attribute_root_cause.md）
+- 选画像前题材气质解析 + 参照系研究（memory feedback_attitude_and_reference_first.md）
+
+## 框架失效信号
+
+如果连续 2 首歌全 binary pass 仍数据弱 / 用户反馈不达标 → **本框架自身需要升级**，可能漏了维度。算子复盘时识别 + 提建议加新维度。
+
+## 案例：用本框架反向审 V2 失败
+
+**替他们看 V2** 用此框架反向 check：
+- B8（跟历史歌重叠度）**fail** — 复刻今潮"百年前 vs 今天" + 玻璃柜 + 新舰过岛
+- C1（BPM 真实感）**fail** — 88 + half-time feel = 实感 44
+- C4（副歌爆发结构）**fail** — 只写"弦乐 swell"，无音区拔高 + 音符密度 + Drop 指令
+- C5（Intro 前 8 秒钩子）**fail** — 写"前 8 秒立题"但无具体旋律 motif
+- C6（力度结构）**partial** — 段落差异化指令不够细
+- C7（编曲层次）**partial** — 缺 Erhu 二胡
+
+**6 条 fail/partial** = 必须重写。如果 V1 时就有这卡，**V2 不会被批准下放**——直接打回墨九 + 阿声重做。
+
+---
+
+**本框架对老周的影响**：**判断稳定可重复 + 不再凭感觉**。用户反馈 V1 V2 V3 时，老周可以**主动指出**具体哪个子项 fail，而不是被动响应"哦这里不好"。

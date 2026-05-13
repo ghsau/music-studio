@@ -34,19 +34,46 @@
 - **外部优先，不造轮子**（2026-05-11 加 / 2026-05-13 扩展到参照系，必走）：任何自动化 / 工具 / 算法需求，**第一步 WebSearch + GitHub 搜专门 repo**，第二步才考虑自己写。对话触发词"能自动化吗 / 有没有工具" → 第一句必为"我先搜外部 3 分钟"。**实现失败 ≥ 2 次强制 stop and search 外部**。详 `memory/feedback_external_first.md`
   - **2026-05-13 扩展：参照系必查**。`/new-song` 选画像前**必走 WebSearch 同类题材+attitude 榜单歌**（≥1 首），抓 BPM / 编曲 / flow / hook motif 作画像参数依据，**禁止凭抽象推论 BPM / 风格**。详 `memory/feedback_attitude_and_reference_first.md`。教训：《老登》V1 BPM 78 + lo-fi 是抽象推论（王以太实测 144 + Pop-Rap），导致 V2/V3 整曲重写。
 
-## 6. 质量门（每阶段 check）
+## 6. 质量门（每阶段 check — 2026-05-14 升级到框架对标）
 
-| 阶段 | check 项 |
+> **以 `knowledge/song-evaluation-framework.md` 为标准操作文档**（6 维度评估卡 + Benchmark 对标机制）。本段是 SOP 提要 + 操作流程。
+
+### Step 0（必走，每首歌第一步）：拉 Benchmark 数据
+
+接到 brief 后**第一步**：
+1. 读 brief「画像」字段 → 定位画像
+2. 翻 `knowledge/styles.md` 该画像段的「Benchmark」字段 → 拿 3 首 TOP 歌的实测数据
+3. **未实测字段（标 `[待实测]`）→ 强制 WebSearch 补**（参 `memory/feedback_external_first.md`）
+4. **WebSearch 实测后回填本字段** — 渐进积累 benchmark 库
+
+**绝不允许凭抽象推论评分**——所有阈值跟 benchmark 对照。
+
+### 各阶段 check（对照 framework 6 维度）
+
+| 阶段 | 必 pass framework 子项 |
 |---|---|
-| 观山 → 墨九 | 概念句 ≤ 30 字、3 关键词具体 |
-| 墨九 → 阿声 | hook ≤ 14 字、整首韵脚一致、≥ 2 意象、含 [Verse 1]/[Chorus]/[Verse 2]/[Bridge]/[Outro] 5 个结构标签、**语意通顺度 review**（见下） |
-| 阿声 → 并行三角色 | style 关键词 ≥ 5、人声明确、结构标签齐 |
-| 青衫 → 老周 | 图像 prompt 可直接粘贴 |
-| 抖叔 → 老周 | 时间码完整、字幕 ≤ 12 字/行 |
-| 小汽 → 老周 | 标题 ≤ 30 字、简介 ≤ 200 字、标签 3~5 个 |
-| 算子 → 收尾 | 数据快照存在 / 变更摘要 |
+| 观山 → 墨九 | A 题材全段（A1 锚点 / A2 现代具象 / A4 审核 / A5 画像匹配） |
+| 墨九 → 阿声 | B1+B5+B6+B7 全 yes；B3 ≥ benchmark 中位数；**B8 跟历史歌重叠 <30%**；§6.50 语意通顺度 review |
+| 阿声 → 并行 | **C1 BPM 真实感（非 half-time）+ C4 副歌爆发结构（跟 benchmark 副歌力度结构 ≥80% match）+ C5 Intro 钩子 + C6 力度结构 + C7 编曲层次 + C9 ≤1000 + C10 g2p 全 yes** |
+| 青衫 → 老周 | D1 防呆 4 规则 + D2 气质匹配 + D3 配色 + D4 字体 + D5 海报版独立 + D6 ≥1440 |
+| 抖叔 → 老周 | 时间码完整、字幕 ≤ 12 字/行（基于 Suno 实际 SRT） |
+| 小汽 → 老周 | E 段全 yes |
+| 算子 → 收尾 | 数据快照 + 变更摘要 + 归因追源（参 `memory/feedback_review_attribute_root_cause.md`） |
 
-不达标 → 同角色重做（最多 2 次）。第 3 次失败 → 中断 autopilot，向用户上报具体卡点。
+不达标 → 同角色重做（最多 2 次）。第 3 次失败 → 中断 autopilot，向用户上报具体卡点（**用 framework 子项编号上报**，如"C4 副歌爆发结构 fail"，不要说"感觉不对"）。
+
+### 用户反馈处理（必走）
+
+用户对任何阶段产物反馈"不达标 / 不抓耳 / 听感差"时，**老周不能反应式修订**，必须：
+1. **用 framework 反向 check 失败子项**（如 V2 替他们看 6 条 fail/partial）
+2. **告诉用户具体哪几个子项 fail + 怎么对照 benchmark 改**
+3. 改完后**重过 framework 全部子项**，不只是用户提到那条
+
+**绝不允许**："感觉这里不好我改改" — 这是被动响应式，造成 V1→V2→V3 反复。要"主动结构性判断"。
+
+### 框架失效信号
+
+如果连续 2 首歌 framework 全 pass 仍数据弱 / 用户反馈不达标 → **framework 自身需要升级**（漏维度 / benchmark 过时）。算子复盘时识别 + 提建议。
 
 ### 语意通顺度 review（墨九 → 阿声 必做）
 
