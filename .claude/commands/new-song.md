@@ -28,8 +28,8 @@
 - 由观山先在心里出 2-4 字曲名（暂存即可，文件夹用此曲名）
 - 路径：`songs/<今天 YYYY-MM-DD>-<曲名>/`
 - 处理重名：若该 slug 已存在，依次追加 `-2`、`-3` ……
-- 拷贝 `templates/00-brief.md` ~ `templates/06-review.md` + `templates/RUN.md` 到该目录
-- 建子目录：`assets/audio/`、`assets/cover/`、`assets/shorts/`
+- 拷贝 `templates/` 下 per-song 文件（00-brief / 01-lyrics / 02-suno-prompt / 03-visual / 05-release / 06-review）+ `templates/RUN.md` 到该目录（**04 槽位已退役** — 视频走发布后可选的 `/make-video`）
+- 建子目录：`assets/audio/`、`assets/cover/`、`assets/mv/`
 
 ### 4. 在 INDEX 登记占位
 在 `songs/INDEX.md` 的 `## 作品` 表添加一行。**`mode_at_creation` 用步骤 2 计算后的 `current_mode`**（即若 5→6 切换刚发生，本首应记为 `converge`）：
@@ -88,20 +88,20 @@
   - 青衫 → `03-visual.md`
   - 小汽 → `05-release.md`
 
-**重要（2026-05-11 重构）**：抖叔**不在 Phase 1**。`04-shortvideo.md` 由用户 Phase 2 跑完 Suno + 导 SRT 后，通过 `/finalize-shortvideo <曲名>` 触发 Phase 3 由抖叔基于 Suno SRT 实际时间码 + 实际唱词写。详 SPEC §2.4 + `personas/00-laozhou-producer.md` §7。
+**重要**：抖叔**不在做歌主线**。视频是**发布后的可选步骤**——用户跑完 Suno 后想做视频，跑 `/make-video <曲名>` 触发抖叔（视频子系统设计见 `docs/superpowers/specs/2026-05-17-video-subsystem.md`）。
 
 ### 6. 老周汇总 RUN.md
-基于已存在的 `templates/RUN.md` 内容（已拷贝），替换 `<曲名>` 为实际曲名，确认步骤指向的 0X 文件路径正确。RUN.md 要明确标注 Phase 2 用户操作流（Suno → SRT → /finalize-shortvideo）。
+基于已存在的 `templates/RUN.md` 内容（已拷贝），替换 `<曲名>` 为实际曲名，确认步骤指向的 0X 文件路径正确。RUN.md 标注 Phase 2 用户操作流（跑 Suno → 出封面 → 上传发布）。
 
 ### 7. 更新 INDEX
-**Phase 1 完成后 status 保持 `draft`**（不升 `package_ready`）—— 等抖叔 Phase 3 跑完后才升 `package_ready`。
+**Phase 1 完成后 status 设 `package_ready`**（工作包文档已齐；视频是发布后可选，不卡此状态）。
 若步骤 2 切到了 converge，更新 `## 全局状态` 段（`current_mode` 与 `mode_switched_at`）。
 
 ### 8. 向用户播报
 温和教练风格的简短消息：
-- 一行总结："`<曲名>` Phase 1 工作包已就绪（含 brief / 词 / Suno prompt / 视觉 / 发布包 5 份）"
-- 2~3 行亮点（来自 00-brief 概念句、01-lyrics 副歌 hook，**不含 04 — 还没写**）
-- 一行行动："照 `songs/<日期-曲名>/RUN.md` 走 Phase 2（跑 Suno + 导 SRT），完成后喊 `/finalize-shortvideo <曲名>` 触发抖叔写 04"
+- 一行总结："`<曲名>` 工作包已就绪（含 brief / 词 / Suno prompt / 视觉 / 发布包 5 份），status = package_ready"
+- 2~3 行亮点（来自 00-brief 概念句、01-lyrics 副歌 hook）
+- 一行行动："照 `songs/<日期-曲名>/RUN.md` 走 Phase 2（跑 Suno + 出封面），上传发布后 `/done <曲名>`。想做视频跑 `/make-video <曲名>`"
 - 若切到了 converge：附一句"从这首开始进入收敛模式"
 
 ## 错误处理

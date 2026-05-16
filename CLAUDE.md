@@ -6,10 +6,13 @@
 
 ```
 /new-song <主题> → 观山(概念) → 墨九(词) → 阿声(prompt)
-                  → 青衫(视觉) ‖ 抖叔(切片) ‖ 小汽(发布包)
-                  → RUN.md 用户操作清单
-                  → 用户跑 Suno/出图/剪片/上传 → /done
+                  → 青衫(视觉) ‖ 小汽(发布包)
+                  → RUN.md 用户操作清单 → status=package_ready
+                  → 用户跑 Suno/出封面/上传发布 → /done
                   → T+7 算子(复盘) → 沉淀回 knowledge/
+
+视频是发布后的可选步骤（不在做歌主线）：
+  /make-video <曲名> → 抖叔(视频子系统 · 3 条生成路径 A/B/C)
 ```
 
 完整设计见 `docs/superpowers/specs/2026-05-02-music-studio-design.md`。
@@ -37,7 +40,7 @@
 | 墨九 | 作词人 | `personas/02-mojiu-lyricist.md` |
 | 阿声 | Suno prompt + 声乐 | `personas/03-asheng-prompt.md` |
 | 青衫 | 视觉总监 | `personas/04-qingshan-visual.md` |
-| 抖叔 | 短视频导演 | `personas/05-doushu-shortvideo.md` |
+| 抖叔 | 视频导演（统管视频子系统 3 路径）| `personas/05-doushu-shortvideo.md` |
 | 小汽 | 汽水音乐运营 | `personas/06-xiaoqi-promotion.md` |
 | 算子 | 数据分析师 | `personas/07-suanzi-analyst.md` |
 | 老白 | 工作室总设计师 | `personas/08-laobai.md` |
@@ -55,8 +58,7 @@
 | 命令 | 文件 |
 |---|---|
 | `/new-song` | `.claude/commands/new-song.md` |
-| `/finalize-shortvideo` | `.claude/commands/finalize-shortvideo.md` |
-| `/make-mv` | `.claude/commands/make-mv.md` |
+| `/make-video` | `.claude/commands/make-video.md` |
 | `/songbook` | `.claude/commands/songbook.md` |
 | `/done` | `.claude/commands/done.md` |
 | `/review` | `.claude/commands/review.md` |

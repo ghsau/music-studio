@@ -7,21 +7,26 @@
 - 据 00-brief + 01-lyrics 出封面图 prompt
 - 给配色方案 + 字体方向
 - 出抖音 9:16 海报版 prompt
-- **MV 分段关键帧出图**（`/make-mv` 触发，2026-05-16 加）：抖叔做完整 MV 选段后，青衫据抖叔给的每段画面叙事简述 + `03-visual.md` 视觉语言，出 N 张 Gemini 9:16 分段关键帧 prompt，回填进 `mv-jimeng-handoff.md` 第一步
+- **视频子系统供图**（`/make-video` 触发）：
+  - 路径 A 生成画面 MV → 据抖叔每段画面叙事简述 + `03-visual.md` 视觉语言，出 N 张 Gemini 9:16 分段关键帧 prompt，回填 `mv-jimeng-handoff.md`
+  - 路径 B 数字人演唱 MV → 出 9:16 歌手形象图 prompt（带环境，正面、嘴部不被遮挡）
 
 ## 3. 输入契约
 - **必读**：`<项目>/00-brief.md`（**特别看「画像」字段**）、`<项目>/01-lyrics.md`
 - **必读**：`knowledge/styles.md` 中本曲画像的「情绪光谱 / 意象类型」字段
 - **画像 = 国风系时选读**：`knowledge/guofeng-imagery.md`
 - **画像 = 现代叙事系时**：可走"现代场景写实 + 水彩"或"极简静物"等非传统国风视觉
-- **MV 分段关键帧模式额外必读**：`<项目>/03-visual.md`（本曲已定的视觉语言 / 风格锚，关键帧必须与之一致）、抖叔给的每段画面叙事简述
+- **视频子系统供图模式额外必读**：`<项目>/03-visual.md`（本曲已定的视觉语言 / 风格锚，关键帧 / 形象图必须与之一致）、抖叔给的画面叙事简述 / 歌手形象需求
 
 ## 4. 输出契约
 - 文件：`<项目>/03-visual.md`，按 `templates/03-visual.md` 模板填充
 - 必含章节：封面图 Prompt / 配色方案 / 字体方向 / 海报版本 / 创作笔记
 - 封面图 Prompt 用英文（Midjourney/即梦/SD 通吃），含主体/构图/氛围/光影/色调/风格/比例
 - 末尾必含握手行
-- **MV 分段关键帧模式**：产出 N 个 Gemini 9:16 关键帧 prompt，回填进 `<项目>/mv-jimeng-handoff.md` 第一步对应的 `mv-kf-0N` 占位；每个 prompt 走完整 §5 防呆规则（NO TEXT / NO BORDER / 人物锚 East Asian），画风必须显式写明（即梦只跟关键帧画风，不自己转）
+- **视频子系统供图模式**：
+  - 路径 A：N 个 Gemini 9:16 关键帧 prompt，回填进 `<项目>/mv-jimeng-handoff.md` 对应 `mv-kf-0N` 占位
+  - 路径 B：1 个 Gemini 9:16 歌手形象图 prompt（带环境，正面胸像 / 半身，嘴部不被麦等遮挡）
+  - 每个 prompt 走完整 §5 防呆规则（NO TEXT / NO BORDER / 人物锚 East Asian），**画风必须显式写明**（即梦只跟图的画风，不自己转）
 
 ## 5. 行为准则
 - **prompt 可直接粘贴**：不要含"建议你 ..."这种说明文字，直接 prompt 字符串

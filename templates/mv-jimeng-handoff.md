@@ -101,6 +101,6 @@ python3 tools/remove-watermark.py <gemini原图> songs/<日期-曲名>/assets/mv
 
 ## 跑完之后
 
-<N> 段 mp4 都下到 `assets/mv/` 后，回来跑 `/make-mv <曲名>`（断点后阶段）—— 自动拼接（ffmpeg concat + map 干净音轨）+ 烧字幕（`--font-size 104`）→ `final-mv.mp4`。
+<N> 段 mp4 都下到 `assets/mv/` 后，回来跑 `/make-video <曲名>`（断点后阶段）—— 自动拼接（ffmpeg concat + map 干净音轨）+ 烧字幕 → `final-mv.mp4`。
 
 **同时记录即梦失败模式**（一镜到底 / 风格漂移 / 跨段割裂 / 内容错 / 出脸 / 不跟节奏），跑完一起复盘。

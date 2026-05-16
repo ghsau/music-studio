@@ -1,227 +1,109 @@
-# 视频制作 Pipeline 🧪
+# 视频子系统 🧪
 
-> 工作室有两条平行视频 pipeline，共用同一套上游真相数据和工具链：
-> - **切片 pipeline** —— 15s/30s 抖音切片（`/finalize-shortvideo` → 抖叔）
-> - **完整 MV pipeline** —— ~60-90s 抖音长视频 MV（`/make-mv` → 抖叔 + 青衫）
+> 抖音视频制作。一个子系统 = **共用底座 + 3 条生成路径**。
+> 完整设计见 `docs/superpowers/specs/2026-05-17-video-subsystem.md`。
+>
+> **视频是发布后的可选步骤**——不是做歌主线门槛。歌做完（词/曲/封面/发布包）即 `package_ready`；要做视频，发布前后跑 `/make-video <曲名>`。
 >
 > **个人实战记录**（具体歌名 + 接续点 + 待优化点）记录在 `notes/video-pipeline-notes.md`，不入 git。
 
 ## 状态
 
-🧪 **实验中** — 工具链已就位。AI 视频生成（即梦 / 可灵 / Runway）输出质量因题材而异，复用时建议先小规模实测。
-- **切片 pipeline**：升级 ✅ 标准见文末。
-- **完整 MV pipeline**：2026-05-15 盼长大端到端跑通 1 首（设计见 `docs/superpowers/specs/2026-05-16-mv-pipeline.md`），需第 2 首达标才升 ✅。
+🧪 **实验中** —— 整个视频子系统在试验期。各路径独立按文末标准升 ✅。
+- 路径 A 生成画面：盼长大 final-mv 跑通 1 首，视觉待优化
+- 路径 B 数字人演唱：盼长大试片跑通，进行中
+- 路径 C 检索素材拼接：待调研落地
 
 ---
 
-## 共用基础
+## 共用底座（3 路径都用）
 
 ### ✅ 1. Suno SRT 是上游真相数据
 
-**问题**：本以为要自建 stable-ts / WhisperX 做歌词对齐。
+Suno 内部 `aligned_lyrics` 接口存有歌词时间码（毫秒精度，创作的"地面真相"）。Chrome 扩展 [Suno Lyric Downloader](https://chrome-stats.com/d/hhplbhnaldbldkgfkcfjklfneggokijm) 一键导出 LRC + SRT（**行级**）。
 
-**真相**：Suno 内部 endpoint `/api/gen/{songId}/aligned_lyrics/v2/` 已存有 word-level 时间码（毫秒精度，是创作的"地面真相"）。Chrome 扩展 [Suno Lyric Downloader](https://chrome-stats.com/d/hhplbhnaldbldkgfkcfjklfneggokijm) 一键导出 LRC + SRT。
-
-**收益**：pipeline 从 1-3 分钟（stable-ts 推理）降到 < 1 秒；精度从 ±2s 升到毫秒级。
+> 注：`aligned_lyrics` 对中文是**短语/句级、非逐字**（2026-05-17 实测）。要逐字得行内插值——见字幕烧入。
 
 **普世教训**：自动化方案先查上游原始数据，别默认自建 ML 推理。
 
 ### ✅ 2. 即梦全能参考模式
 
-**核心创新**：四模态混合输入（图 + 视频 + 音频 + 文本），**音频驱动镜头切换**——重音→切镜，弱拍→留白，是首次声音作为视频生成参考素材。
-
-**最佳素材组合**（参 [官方教程](https://zhuanlan.zhihu.com/p/2023700533832065608)）：
-- @图片1 美术风格锚（封面）
-- @图片2 关键帧锚（海报 / 分段关键帧）
-- @音频1 节奏锚
-- 文字 prompt 含氛围 + 主体 + 风格 + 镜头线索 + 禁忌
-
-**禁忌**：
-- 不要超 3 张图（5 件素材最佳，9 张是上限非推荐）
-- 不要分镜驱动（违背模型自由调度的设计）
+四模态混合输入（图 + 视频 + 音频 + 文本），音频驱动镜头切换。最佳素材组合：@图片1 美术风格锚（封面）+ @图片2 关键帧锚 + @音频1 节奏锚 + 文字 prompt（氛围 + 主体 + 风格 + 镜头线索 + 禁忌）。禁忌：不超 3 张图、不要分镜驱动。
 
 ### 工具清单
 
-#### `tools/cut-chorus.py`
-找 hook 句首次（或第 N 次）出现的时间，ffmpeg 切片（**切片 pipeline 用**）。
-
-**双路径设计**：
-- 优先：`--lyrics-srt PATH` 走 Suno 导出的 SRT（毫秒精度，零模型推理）✅
-- Fallback：`--full-lyrics PATH` 走 stable-ts 强制对齐（中文歌曲偏差 ±2s，不推荐）
-
-**关键参数**：
-- `--occurrence N` ：hook 句第几次出现（默认 1=Chorus 1；Final Chorus 通常 = 3）
-- `--lead-in SECONDS`：起点提前几秒（默认 0.2，赶 13s 上限时设 0）
-- `--duration SECONDS`：切片时长（默认 15，即梦免费档 UI 实测 13s 上限）
-
-#### `tools/align-lyrics.py`
-SRT → .ass → ffmpeg 烧字幕。**两条 pipeline 都用**。
-
-**双路径**同 cut-chorus。
-
-**关键参数**：
-- `--hook + --occurrence + --lead-in`：定位视频在原曲中的位置（与切片严格同步）
-- `--audio-tempo`：如果切片做了 atempo 压缩（如 1.0758），字幕时间同步压缩
-- `--font-size`：字号。默认 64 是按 1080×1920 ASS 画布算的，**切片用默认，完整 MV 用 104**（见下方完整 MV pipeline 第 5 步）
-
-#### `tools/cut-audio.sh`
-最朴素的 ffmpeg 切片包装（手指定起始时间），无智能。fallback / 完整 MV 分段切音频用。
-
-#### `tools/remove-watermark.py`
-GWR 引擎擦 Gemini sparkle 水印（关键帧 / 封面出图后必走）。详见 `personas/04-qingshan-visual.md` §5 防呆规则 5。
-
----
-
-## 切片 pipeline（15s / 30s）
-
-```
-[L1 素材层]  完整 mp3 + SRT（Suno 毫秒时间码） + 风格图
-                  ↓
-[L2 切片层]  cut-chorus.py（找 hook + 切音频段）
-                  ↓
-[L3 生成层]  即梦 / 可灵 / Runway 全能参考模式（4 件素材 + 文字 prompt）
-                  ↓
-[L4 合成层]  align-lyrics.py（SRT 转 .ass + ffmpeg 烧字幕）
-                  ↓
-            final-XXs.mp4
-```
+| 工具 | 用途 |
+|---|---|
+| `tools/cut-chorus.py` | 找 hook 句出现时间 + ffmpeg 切片（双路径：Suno SRT 优先 / stable-ts fallback）|
+| `tools/cut-audio.sh` | 手指定起始时间的朴素切片（MV 分段切音频用）|
+| `tools/align-lyrics.py` | SRT → ASS → ffmpeg 烧字幕。`--karaoke` 卡拉OK模式 |
+| `tools/remove-watermark.py` | GWR 引擎擦 Gemini sparkle 水印（关键帧/封面出图后必走）|
 
 ### ✅ 3. atempo 加速突破时长上限
 
-**问题**：即梦免费档音频 ≤ 13s，但完整 Pre-Chorus 段常超 13s。
+即梦免费档音频 ≤ 13s。超长段用 ffmpeg `atempo=1.0758` 微加速（3.5-7% 人耳几乎不察）压到 ≤12.99s。字幕同步压缩：`align-lyrics.py --audio-tempo <ratio>`。会员档单段 15s，无需 atempo。
 
-**解法**：ffmpeg `atempo=1.0758` 微加速（3.5-7% 范围内人耳几乎不察），把超长段压缩到 ≤ 12.99s。
+### 字幕烧入（align-lyrics.py）
 
-**模板**：
-```bash
-# Step 1: 切完整源段（含 0.5s buffer 留尾音）
-ffmpeg -i full.mp3 -ss <start> -t <duration+0.5> -c:a libmp3lame -q:a 2 /tmp/full.mp3
-
-# Step 2: atempo 压缩到 ≤ 12.99s（< 13s 严格）
-ffmpeg -i /tmp/full.mp3 -af "atempo=<ratio>" -t 12.99 -c:a libmp3lame -q:a 2 final.mp3
-```
-
-`ratio = source_duration / target_duration`（保 < 13s 时把 target 设 12.99）。
-
-字幕时间同步压缩：align-lyrics.py 加 `--audio-tempo <ratio>`。
-
-> 注：即梦**会员档**单段可到 15s，无需 atempo。atempo 仅免费档 / 13s 卡线时用。
-
-### ✅ 4. 选段策略（切片）
-
-15s 切片可选 4 类切法（13s 时类似但要更挑剔）：
-
-| 选段 | 内容 | 适用 |
-|---|---|---|
-| Chorus 1 起拍 | hook + 反差 punch 内容 | 反差直白题材 |
-| Final Chorus 起拍 | hook + 觉悟句 + 终章前奏 | 觉悟终结题材 |
-| **Pre-Chorus 反转弧** ⭐ | 设定 → 画面 → 前提 → 反转 4 句完整 | **社交媒体黄金"觉悟反转"结构** |
-| 手指定其他段 | 用 cut-audio.sh | 兜底 |
-
-**判断**：Pre-Chorus 反转弧最戳——设定→画面→前提→反转，4 句完整呈现是抖音爆款结构。
-
-### 切片 AI 视频生成的待优化方向
-
-复用时可能遇到 AI 视频效果不达发布标准（一镜到底 / 风格漂移 / 切镜不跟节奏 / 出脸 / 速度感不对）。可调优方向：
-
-1. **改图组合**：试 cover + 1 张分镜关键帧 + 1 张运镜参考视频 + 音频
-2. **prompt 精简**：镜头线索写太细会限制模型；试纯氛围 + 风格 + 主体三段
-3. **时长试 14-15s**：UI 实测 13s 但官方说 15s
-4. **换其他工具**：可灵 AI / Runway Gen-4 / Pika 2.x 对比
-5. **手剪兜底**：用封面 / 海报作背景 + Ken Burns 运动 + ffmpeg 字幕，保 95% 质量
+- **静态字幕**：`--font-size 104`（完整 MV，默认 64 在竖屏上偏小）
+- **卡拉OK字幕**：`--karaoke` —— 逐字扫光填充（`\kf`）+ 入场动效 + 位置上移避开抖音底部 UI。PlayRes 跟随视频实际宽高。逐字时间码按行级时长行内均分插值（Suno 不提供逐字，实测够用）。字幕整体提前 ~0.3s 盖住入场动效耗时
+- hook 定位：`--hook "<首句>" --lead-in 0`
 
 ---
 
-## 完整 MV pipeline（~60-90s）
+## 路径 A · 生成画面 MV 🧪（待优化）
 
-> 抖音 / 视频号长视频 MV。2026-05-15 盼长大端到端跑通。设计见 `docs/superpowers/specs/2026-05-16-mv-pipeline.md`。
-> 触发：`/make-mv <曲名>`（断点前选段+关键帧，断点后拼接+字幕）。
+> 歌词 → Gemini 关键帧 → 即梦逐段生成 → 拼接。= 盼长大 final-mv。
+> 主理人评：当前视觉普通、没发挥即梦优势 → 标「待优化」，后续专门迭代。
 
 ```
-[1 选段切音频]  抖叔从全曲 SRT 选 ~60-90s 连续段落 → ffmpeg 切成 N 段（每段 ≤15s）
-                  + 同范围整段导出作最终音轨（full-Xmin.mp3）
-                       ↓
-[2 分段关键帧]  青衫出 N 张 Gemini 9:16 关键帧 prompt（推进画面叙事）
-                  用户跑 Gemini → remove-watermark.py 擦水印 → assets/mv/mv-kf-0N.png
-                       ↓  ← 用户手动断点
-[3 即梦逐段]    全能参考模式：@图片1=cover-clean（风格锚，全段共用）
-                  + @图片2=该段关键帧 + @音频1=该段音频
-                  会员 15s/段 + 最新模型；每段 ≥4 版选最稳 → assets/mv/mvN.mp4
-                       ↓  ← 用户手动断点
-[4 拼接]        ffmpeg filter_complex：每段 trim 到精确时长 + concat
-                  + map 干净音轨（full-Xmin.mp3，丢弃即梦自带音轨）
-                       ↓
-[5 烧字幕]      align-lyrics.py --font-size 104 → final-mv.mp4
+[1 选段切音频]  抖叔从全曲 SRT 选连续段落 → 切 N 段（每段 ≤15s）+ 整段导出作音轨
+[2 分段关键帧]  青衫出 N 张 Gemini 9:16 关键帧 → 擦水印 → assets/mv/mv-kf-0N.png
+                     ↓ 用户手动断点
+[3 即梦逐段]    全能参考：@图片1=cover-clean（风格锚）+ @图片2=关键帧 + @音频1=该段音频
+                     ↓ 用户手动断点
+[4 拼接]        ffmpeg trim 精确时长 + concat + map 干净音轨
+[5 烧字幕]      align-lyrics.py → final-mv.mp4
 ```
 
-### 完整 MV 与切片的关键差异
+- 即梦交接模板：`templates/mv-jimeng-handoff.md`
+- **关键坑：关键帧画风 = 即梦输出画风**——想要水墨，关键帧 Gemini prompt 必须显式出成水墨，即梦不会自己转
+- **切片（短版）**：路径 A 出 15-30s 短版 = 选 1 段、流程同上。"切片"是长度选项，不是独立路径
 
-| 维度 | 切片 (15s/30s) | 完整 MV (~60-90s) |
-|---|---|---|
-| 段数 | 1 段 | N 段（盼长大 5 段） |
-| 单段时长 | ≤13s（即梦免费档）| ≤15s（即梦会员档） |
-| 跨段一致性 | 不涉及 | 关键——靠一张 cover 作全段风格锚 |
-| 关键帧 | 1 张 | N 张分段关键帧（青衫专出） |
-| 字幕字号 | `--font-size 64`（默认） | `--font-size 104` |
-| 触发命令 | `/finalize-shortvideo` | `/make-mv` |
+## 路径 B · 数字人演唱 MV 🧪
 
-### 关键坑
+> 歌手形象图 → 即梦数字人对口型逐段 → 拼接。当前角色：沧桑叙事型男歌手。
 
-**1. 关键帧画风 = 即梦输出画风。** 即梦忠实跟关键帧的画风，不会自己转。盼长大关键帧出成写实电影感 → 即梦跟成写实，偏离了 `03-visual.md` 的「古风水墨融合」。**想要水墨，关键帧 Gemini prompt 必须显式出成水墨。**
-
-**2. 字幕字号。** `align-lyrics.py` 默认 `--font-size 64` 按 1080×1920 ASS 画布算；MV 实际 720×1280，缩放后只剩 ~43px（占画面高 3.3%）偏小。**完整 MV 用 `--font-size 104`**（缩放后 ~69px / 占高 5.4%，落在 MV 常规 5-6% 区间）。
-
-**3. 即梦实际出 ~15.07s/段。** 拼接时每段要 `trim` 回精确时长（盼长大：前 4 段 trim 0:15，末段 trim 到音频实长）。
-
-**4. 跨段一致性靠 cover 风格锚。** N 段只用一张 cover 作 @图片1 风格锚，即梦会员最新模型成片仍像同一部片（盼长大 5 段验证 PASS）。
-
-### 拼接命令模板
-
-```bash
-ffmpeg -y -i mv1.mp4 ... -i mvN.mp4 -i full-Xmin.mp3 \
-  -filter_complex "[0:v]trim=0:15,setpts=PTS-STARTPTS[v0]; ... ;
-                   [vN-1]...[concat=n=N:v=1:a=0[outv]" \
-  -map "[outv]" -map N:a \
-  -c:v libx264 -preset medium -crf 18 -pix_fmt yuv420p \
-  -c:a aac -b:a 192k -shortest mv-assembled.mp4
+```
+[1 选段切音频]  同路径 A
+[2 歌手形象]    青衫出 9:16 歌手形象图（带环境）→ 擦水印
+                     ↓ 用户手动断点
+[3 即梦对口型]  即梦「数字人」大师模式：上传歌手形象图 + 该段音频 + 动作 prompt
+                即梦数字人底层 OmniHuman，中文对口型强；单图驱动，环境跟形象图走
+                     ↓ 用户手动断点
+[4 拼接]        同路径 A
+[5 烧字幕]      align-lyrics.py --karaoke（卡拉OK扫光，整体提前 ~0.3s）
 ```
 
-### 烧字幕命令
+- **形象图必须 9:16**（抖音竖屏；3:4 会裁/留边）
+- **待解决**：即梦视频水印去除（`remove-watermark.py` 只擦 Gemini 图水印，不适用即梦视频水印）
+- 关键帧画风 = 即梦输出画风：写实形象图给写实对口型最准
 
-**静态字幕**（空镜 MV）：
-```bash
-python3 tools/align-lyrics.py \
-  --input-video <拼好的MV> --lyrics-srt <全曲SRT> \
-  --hook "<MV首句>" --lead-in 0 --font-size 104 \
-  --output final-mv.mp4
-```
+## 路径 C · 检索素材拼接 MV 🧪（待调研落地）
 
-**卡拉OK字幕**（演唱版 MV，加 `--karaoke`）：
-```bash
-python3 tools/align-lyrics.py --karaoke \
-  --input-video <拼好的MV> --lyrics-srt <全曲SRT> \
-  --hook "<MV首句>" --lead-in 0 \
-  --output final-mv.mp4
-```
-`--karaoke` 模式：逐字扫光填充（`\kf`）+ 入场淡入弹出 + 位置上移（避开抖音底部描述区）。PlayRes 自动跟随视频实际宽高（非 9:16 不变形）；字号默认按视频高 5.5% 自适应。逐字时间码按行级时长在行内均分插值。无关键词高亮（2026-05-16 主理人确认先不做）。
+> 歌词意象 → 检索现成素材 → 剪辑拼接。定位：A/B 之外的**低成本快速兜底**路径。
 
-`align-lyrics.py` 对全长 MV 一样适用（按 hook 定位 + 自动提取时间窗内字幕 + 过滤结构标签）。
-
-### 即梦失败模式记录
-
-复用时记录失败模式（一镜到底 / 风格漂移 / 跨段割裂 / 内容错 / 出脸 / 不跟节奏），跑完一起复盘。即梦会员最新模型 2026-05-15 verdict：跨段一致性 PASS，质量明显优于旧版，平替（Kling / Vidu）暂不需要。
-
----
-
-## 字幕烧入注意
-
-`align-lyrics.py` 默认用 `PingFang SC`（macOS 默认 CJK 字体），但 ffmpeg ass filter 在某些环境可能找不到字体。**首次使用时实测一次**，必要时配 `--fonts-dir`。
+- **中文素材源**：[爱给网](https://www.aigei.com/video/background/chinese_style/)（中国风背景视频专区）、摄图网、潮点视频、包图网、制片帮
+- ⚠️ **版权**："免费"≠"可商用"，商业发布须确认授权范围 + 留授权凭证
+- **诚实定位**：2026 评测共识——检索拼接质量天花板明显低于 AI 生成画面。C 是兜底，不是主力
+- 落地方式：抖叔按歌词意象从中文素材站检索片段 + ffmpeg 拼接 + align-lyrics 烧字幕（暂不强求全自动工具）
 
 ---
 
 ## 升级 ✅ 标准
 
-- **切片 pipeline**：待跑通 ≥ 2 首歌且视频效果均达发布标准，升级 ✅。
-- **完整 MV pipeline**：盼长大已跑通 1 首，待第 2 首完整 MV 达标后升级 ✅。
+各路径独立判定：**某路径跑通 ≥ 2 首歌且效果均达发布标准 → 该路径升 ✅**（算子 T+7 复盘归因，记录到 `notes/video-pipeline-notes.md`）。子系统整体在所有路径都 ✅ 前保持 🧪。
 
-**升级时归因记录到 `notes/video-pipeline-notes.md`。**
+## 字幕字体注意
+
+`align-lyrics.py` 默认 `PingFang SC`。ffmpeg ass filter 在某些环境找不到字体时配 `--fonts-dir`，首次实测一次。

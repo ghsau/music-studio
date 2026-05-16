@@ -56,7 +56,6 @@
 | 墨九 → 阿声 | B1+B5+B6+B7 全 yes；B3 ≥ benchmark 中位数；**B8 跟历史歌重叠 <30%**；§6.50 语意通顺度 review |
 | 阿声 → 并行 | **C1 BPM 真实感（非 half-time）+ C4 副歌爆发结构（跟 benchmark 副歌力度结构 ≥80% match）+ C5 Intro 钩子 + C6 力度结构 + C7 编曲层次 + C9 ≤1000 + C10 g2p 全 yes** |
 | 青衫 → 老周 | D1 防呆 4 规则 + D2 气质匹配 + D3 配色 + D4 字体 + D5 海报版独立 + D6 ≥1440 |
-| 抖叔 → 老周 | 时间码完整、字幕 ≤ 12 字/行（基于 Suno 实际 SRT） |
 | 小汽 → 老周 | E 段全 yes |
 | 算子 → 收尾 | 数据快照 + 变更摘要 + 归因追源（参 `memory/feedback_review_attribute_root_cause.md`） |
 
@@ -114,8 +113,9 @@ grep -n "<旧句关键词>\|<旧意象>" 0?-*.md
 | `01-lyrics.md` 自身 | 副歌钩子段 / 押韵脚说明 / **意象清单**（极易遗漏！）/ Suno 输入版 / 创作笔记（保留历史版本注，但当前结论需更新） |
 | `02-suno-prompt.md` | 结构标签清单 / 关键提醒 — 是否提到旧歌词位置 |
 | `03-visual.md` | 封面 prompt / 海报 prompt / 配色辅助色注释 / 字号建议 / 创作笔记 — 任何引用旧场景或意象（如"出租屋""泡面"等具象词）|
-| `04-shortvideo.md` | **15s 切片字幕**（极易遗漏！）/ **30s 切片字幕** / 卡点位置笔记 / 选段理由 / 通用画面策略 / 创作笔记 |
 | `05-release.md` | 标题 / **简介**（极易遗漏！）/ **抖音文案** / 置顶评论 / 创作笔记 |
+
+> 视频做了的话（`/make-video`），歌词修订后 `mv-jimeng-handoff.md` 的字幕 / 即梦 prompt 也要一并扫。
 
 **审查方法（双层）**：
 1. **关键词 grep**：扫旧句字面（如"翻译了一辈子"）+ 旧意象（如"出租屋""泡面"）+ 旧反差点（如"加班""熬夜"）
@@ -132,36 +132,28 @@ grep -n "<旧句关键词>\|<旧意象>" 0?-*.md
 
 ## 7. 调度规则（老周专属）
 
-### autopilot 触发顺序（2026-05-11 重构为三阶段）
+### autopilot 触发顺序
 
-**Phase 1（autopilot 一次跑完，Suno 跑前）**：
+**Phase 1（`/new-song`，autopilot 一次跑完）**：
 ```
 1. 老周创建项目骨架 + INDEX 占位（status=draft, mode=当前全局 mode）
-1.5. **老周读 styles.md 选画像** → 写到 00-brief.md「画像」字段（主画像必填，副画像可省）
-2. 观山 → 00-brief.md（画像字段已由老周填好，观山填其余）
+1.5. 老周读 styles.md 选画像 → 写到 00-brief.md「画像」字段（主画像必填，副画像可省）
+2. 观山 → 00-brief.md
 3. 墨九 → 01-lyrics.md
 4. 阿声 → 02-suno-prompt.md
-5. 并行：青衫 → 03-visual.md / 小汽 → 05-release.md（抖叔不在 Phase 1）
-6. 老周汇总 → RUN.md（提示用户 Phase 2 操作流）
-7. 老周保持 INDEX status = **draft**（等 Phase 3 才升 package_ready）
+5. 并行：青衫 → 03-visual.md / 小汽 → 05-release.md
+6. 老周汇总 → RUN.md
+7. 老周升 INDEX status → package_ready（工作包文档已齐）
 ```
 
 **Phase 2（用户操作，autopilot 暂停）**：
 ```
 8. 用户跑 Suno → 选 take → mp3 落到 assets/audio/<曲名>.mp3
-9. 用户用 Chrome 扩展导 SRT → 落到 assets/audio/<曲名>.srt
-10. 用户喊 `/finalize-shortvideo <曲名>` 触发 Phase 3
+9. 用户出封面（Gemini → 擦水印）→ assets/cover/
+10. 用户上传汽水 / 抖音发布 → `/done <曲名>`（status → released）→ T+7 算子 /review
 ```
 
-**Phase 3（autopilot 续跑，由 `/finalize-shortvideo` 触发）**：
-```
-11. 抖叔基于 Suno SRT 写 04-shortvideo.md（**精确时间码 + SRT 实际唱词作字幕**）
-12. 老周质量门 + INDEX status → **package_ready**
-```
-
-**Phase 4（用户）**：出封面（擦水印）+ 上传发布 + `/done <曲名>`
-
-**为什么 Phase 1 不含抖叔**：抖叔输出依赖**实际音频时间码 + 实际唱词**，跑 Suno 前写 04 时间码全是 BPM 估值不准 + Suno 可能吃字改字。SPEC §2.4 / `memory/feedback_external_first.md` 反思已细化。
+**视频是发布后的可选步骤，不在做歌主线**：想给某首歌做抖音视频，跑 `/make-video <曲名>` 触发抖叔（视频子系统，3 条生成路径 A/B/C，设计见 `docs/superpowers/specs/2026-05-17-video-subsystem.md`）。视频不卡 `package_ready` / `released`。`/make-video` 需要 Suno SRT —— 用户做视频时用 Chrome 扩展导出 `assets/audio/<曲名>.srt`。
 
 ### ⭐ 步骤 0：起心动念判断（2026-05-14 加，必走 — 双模式分流）
 
