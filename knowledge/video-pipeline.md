@@ -188,12 +188,22 @@ ffmpeg -y -i mv1.mp4 ... -i mvN.mp4 -i full-Xmin.mp3 \
 
 ### 烧字幕命令
 
+**静态字幕**（空镜 MV）：
 ```bash
 python3 tools/align-lyrics.py \
   --input-video <拼好的MV> --lyrics-srt <全曲SRT> \
   --hook "<MV首句>" --lead-in 0 --font-size 104 \
   --output final-mv.mp4
 ```
+
+**卡拉OK字幕**（演唱版 MV，加 `--karaoke`）：
+```bash
+python3 tools/align-lyrics.py --karaoke \
+  --input-video <拼好的MV> --lyrics-srt <全曲SRT> \
+  --hook "<MV首句>" --lead-in 0 \
+  --output final-mv.mp4
+```
+`--karaoke` 模式：逐字扫光填充（`\kf`）+ 入场淡入弹出 + 位置上移（避开抖音底部描述区）。PlayRes 自动跟随视频实际宽高（非 9:16 不变形）；字号默认按视频高 5.5% 自适应。逐字时间码按行级时长在行内均分插值。无关键词高亮（2026-05-16 主理人确认先不做）。
 
 `align-lyrics.py` 对全长 MV 一样适用（按 hook 定位 + 自动提取时间窗内字幕 + 过滤结构标签）。
 

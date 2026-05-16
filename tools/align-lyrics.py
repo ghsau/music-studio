@@ -48,6 +48,10 @@ OUTLINE_COLOR = "&H00000000"
 BACK_COLOR = "&H80000000"
 ENCODING = 134
 
+# 卡拉OK模式（完整 MV 演唱版用 --karaoke）
+KARAOKE_SUNG = "&H00FFFFFF"    # 已唱=白
+KARAOKE_UNSUNG = "&H00B0B0B0"  # 未唱=灰
+
 DEFAULT_LEAD_IN = 0.2  # 与 cut-chorus.py 同步
 
 
@@ -120,6 +124,17 @@ def get_video_duration(video: Path) -> float:
         capture_output=True, text=True, check=True,
     ).stdout.strip()
     return float(out)
+
+
+def get_video_dimensions(video: Path) -> tuple:
+    """读视频实际宽高 —— 卡拉OK模式让 ASS PlayRes 跟随，避免非 9:16 视频字幕被拉变形"""
+    out = subprocess.run(
+        ["ffprobe", "-v", "error", "-select_streams", "v:0",
+         "-show_entries", "stream=width,height", "-of", "csv=p=0", str(video)],
+        capture_output=True, text=True, check=True,
+    ).stdout.strip()
+    w, h = out.split(",")[:2]
+    return int(w), int(h)
 
 
 def extract_video_segments(blocks: list, video_offset_in_full: float,
@@ -216,6 +231,61 @@ def write_ass(segments: list, ass_out: Path, font: str, font_size: int):
     ass_out.write_text("".join(lines), encoding="utf-8")
 
 
+def write_ass_karaoke(segments: list, ass_out: Path, font: str,
+                      video_w: int, video_h: int, font_size: int = None):
+    """卡拉OK模式 ASS：逐字扫光填充（\\kf）+ 入场动效。完整 MV 演唱版用。
+
+    - PlayRes 跟随视频实际宽高，非 9:16 视频不变形
+    - 逐字时间码：按行级时长在行内按字数均分插值（足够精准；
+      若将来接 Suno word-level 数据可在此替换为真实逐字时间）
+    - 无关键词高亮（2026-05-16 主理人确认：先不做）
+    """
+    print(f"[字幕] 生成卡拉OK ASS → {ass_out.name}（PlayRes {video_w}×{video_h}）")
+    fs = font_size or round(video_h * 0.055)
+    margin_v = round(video_h * 0.27)        # 上移避开抖音底部描述区
+    outline = max(2, round(video_h * 0.0025))
+    header = (
+        "[Script Info]\n"
+        "Title: karaoke\n"
+        "ScriptType: v4.00+\n"
+        "WrapStyle: 2\n"
+        "ScaledBorderAndShadow: yes\n"
+        f"PlayResX: {video_w}\n"
+        f"PlayResY: {video_h}\n"
+        "\n"
+        "[V4+ Styles]\n"
+        "Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, "
+        "OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, "
+        "ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, "
+        "Alignment, MarginL, MarginR, MarginV, Encoding\n"
+        f"Style: K,{font},{fs},{KARAOKE_SUNG},{KARAOKE_UNSUNG},"
+        f"{OUTLINE_COLOR},{BACK_COLOR},-1,0,0,0,100,100,2,0,1,"
+        f"{outline},2,2,70,70,{margin_v},{ENCODING}\n"
+        "\n"
+        "[Events]\n"
+        "Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, "
+        "Effect, Text\n"
+    )
+    entrance = "{\\fad(140,0)\\fscx82\\fscy82\\t(0,220,\\fscx100\\fscy100)}"
+    lines = [header]
+    for seg in segments:
+        chars = list(seg["text"].replace("\n", ""))
+        n = len(chars)
+        if n == 0:
+            continue
+        dur_cs = int(round((seg["end"] - seg["start"]) * 100))
+        base = dur_cs // n
+        k = []
+        for i, c in enumerate(chars):
+            d = base if i < n - 1 else dur_cs - base * (n - 1)
+            k.append(f"{{\\kf{max(d, 1)}}}{c}")
+        lines.append(
+            f"Dialogue: 0,{fmt_ass_time(seg['start'])},"
+            f"{fmt_ass_time(seg['end'])},K,,0,0,0,,{entrance}{''.join(k)}\n"
+        )
+    ass_out.write_text("".join(lines), encoding="utf-8")
+
+
 def burn_subtitles(video: Path, ass: Path, output: Path, fonts_dir: Path = None):
     print(f"[烧字幕] ffmpeg → {output.name}")
     vf = f"ass={ass.as_posix()}"
@@ -257,6 +327,8 @@ def main():
                     help=f"Whisper 模型（仅 fallback 用，默认 {DEFAULT_MODEL}）")
     ap.add_argument("--font", default=DEFAULT_FONT)
     ap.add_argument("--font-size", type=int, default=DEFAULT_FONT_SIZE)
+    ap.add_argument("--karaoke", action="store_true",
+                    help="卡拉OK模式：逐字扫光填充 + 入场动效 + 位置上移（完整 MV 演唱版用）")
     ap.add_argument("--keep-intermediate", action="store_true")
     ap.add_argument("--fonts-dir", type=Path, default=None)
     ap.add_argument("--occurrence", type=int, default=1,
@@ -328,7 +400,12 @@ def main():
         # 写 ass + 烧字幕
         if not segments:
             sys.exit("✗ 没有任何字幕行，检查输入")
-        write_ass(segments, ass_file, args.font, args.font_size)
+        if args.karaoke:
+            vw, vh = get_video_dimensions(args.input_video)
+            fs = args.font_size if args.font_size != DEFAULT_FONT_SIZE else None
+            write_ass_karaoke(segments, ass_file, args.font, vw, vh, fs)
+        else:
+            write_ass(segments, ass_file, args.font, args.font_size)
         burn_subtitles(args.input_video, ass_file, args.output, args.fonts_dir)
 
         if args.keep_intermediate:
