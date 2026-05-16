@@ -55,6 +55,8 @@
 | 命令 | 文件 |
 |---|---|
 | `/new-song` | `.claude/commands/new-song.md` |
+| `/finalize-shortvideo` | `.claude/commands/finalize-shortvideo.md` |
+| `/make-mv` | `.claude/commands/make-mv.md` |
 | `/songbook` | `.claude/commands/songbook.md` |
 | `/done` | `.claude/commands/done.md` |
 | `/review` | `.claude/commands/review.md` |

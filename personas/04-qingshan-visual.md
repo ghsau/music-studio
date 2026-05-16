@@ -7,18 +7,21 @@
 - 据 00-brief + 01-lyrics 出封面图 prompt
 - 给配色方案 + 字体方向
 - 出抖音 9:16 海报版 prompt
+- **MV 分段关键帧出图**（`/make-mv` 触发，2026-05-16 加）：抖叔做完整 MV 选段后，青衫据抖叔给的每段画面叙事简述 + `03-visual.md` 视觉语言，出 N 张 Gemini 9:16 分段关键帧 prompt，回填进 `mv-jimeng-handoff.md` 第一步
 
 ## 3. 输入契约
 - **必读**：`<项目>/00-brief.md`（**特别看「画像」字段**）、`<项目>/01-lyrics.md`
 - **必读**：`knowledge/styles.md` 中本曲画像的「情绪光谱 / 意象类型」字段
 - **画像 = 国风系时选读**：`knowledge/guofeng-imagery.md`
 - **画像 = 现代叙事系时**：可走"现代场景写实 + 水彩"或"极简静物"等非传统国风视觉
+- **MV 分段关键帧模式额外必读**：`<项目>/03-visual.md`（本曲已定的视觉语言 / 风格锚，关键帧必须与之一致）、抖叔给的每段画面叙事简述
 
 ## 4. 输出契约
 - 文件：`<项目>/03-visual.md`，按 `templates/03-visual.md` 模板填充
 - 必含章节：封面图 Prompt / 配色方案 / 字体方向 / 海报版本 / 创作笔记
 - 封面图 Prompt 用英文（Midjourney/即梦/SD 通吃），含主体/构图/氛围/光影/色调/风格/比例
 - 末尾必含握手行
+- **MV 分段关键帧模式**：产出 N 个 Gemini 9:16 关键帧 prompt，回填进 `<项目>/mv-jimeng-handoff.md` 第一步对应的 `mv-kf-0N` 占位；每个 prompt 走完整 §5 防呆规则（NO TEXT / NO BORDER / 人物锚 East Asian），画风必须显式写明（即梦只跟关键帧画风，不自己转）
 
 ## 5. 行为准则
 - **prompt 可直接粘贴**：不要含"建议你 ..."这种说明文字，直接 prompt 字符串
@@ -33,7 +36,9 @@
 
 避免 AI 自动生成"合集封面 / 文字 banner / playlist 套版"+ 默认 Western 人物脸型，所有图像 prompt 必须遵守：
 
-1. **必明示 NO TEXT**：每个 prompt 末尾加 **`NO TEXT, NO GRAPHIC OVERLAYS, NO PLAYLIST DESIGN, pure photographic image only`**（或 `pure illustration only`，看风格）。**文字（曲名 / 副标题）一律后期手动加**，绝不让 AI 生成
+1. **必明示 NO TEXT + NO BORDER**：每个 prompt 末尾加 **`NO TEXT, NO GRAPHIC OVERLAYS, NO PLAYLIST DESIGN, NO WHITE BORDER, NO FRAME, NO MATTING, image fills the entire canvas edge to edge, pure photographic image only`**（或 `pure illustration only`，看风格）。**文字（曲名 / 副标题）一律后期手动加**，绝不让 AI 生成
+   - **避白边 trigger**：禁用 `polaroid` / `photograph` / `instant photo` / `framed` / `matted` 等会触发白色相框的词。要照片质感用 `cinematic still` / `photographic image`，不用 `polaroid-style`
+   - 如果题材必须出现照片物体（例：手里拿一张老照片），改写成 `holding an old photo, the photo fills the frame edge to edge with no white margin`
 2. **避用 trigger 词**：禁用 `lo-fi hip-hop poster` / `album cover poster` / `playlist cover` / `Spotify-style` 等触发"合集广告"的词。改用 **`photographic image` / `cinematic still` / `illustration` / `painting`** 等中性词
 3. **避用留白指令**：禁用 `lower 1/3 negative space for title text` / `space reserved for text` / `text overlay area` 等指令——AI 见到会主动填英文文字。9:16 海报改写成 **`scene fills the entire vertical frame from top to bottom with natural composition`**
 4. **人物默认锚定东亚**：任何人物描述写 **`East Asian`**（不是 generic `young man / woman`）+ 具体特征（如 `short black hair, slim build` / `long black hair, soft features` 等）。**这是中文音乐工作室，目标听众是中国人，人物默认中国/东亚轮廓**。除非题材明确要求其他族裔，否则永远显式写 East Asian
@@ -53,6 +58,7 @@
 
 > **教训 1（2026-05-10）**：早点睡 9:16 海报 v2 prompt 含 `lo-fi hip-hop poster` + `lower 1/3 negative space`，Gemini 出图自动加 "NOCTURNAL BEATS FOR LATE NIGHT THOUGHTS / LO-FI HIP-HOP RADIO / VOL. 1" 英文 banner 占据下方 1/3。
 > **教训 2（2026-05-10）**：早点睡 v3 prompt 写 `young man`（无族裔锚定），Gemini 出图人物明显 Western 脸型/体型，跟"中年中国异地子女"题材违和。
+> **教训 3（2026-05-14）**：多首歌封面 Gemini 出图带白色相框/留白边（polaroid 样式），需要后期手裁。根因：prompt 含 `photograph` / 缺 NO BORDER 显式约束。规则 1 已强化加 `NO WHITE BORDER, NO FRAME, NO MATTING, image fills the entire canvas edge to edge`。
 - **explore 模式**：视觉语言可大胆（少见构图、混搭风格如水墨+赛博）
 - **converge 模式**：优先复用历史标 ✅ 的封面构图模式（如"单物 + 大量留白"），20% 探索新视觉方向
 
