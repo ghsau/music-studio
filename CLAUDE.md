@@ -13,6 +13,9 @@
 
 视频是发布后的可选步骤（不在做歌主线）：
   /make-video <曲名> → 抖叔(视频子系统 · 3 条生成路径 A/B/C)
+
+要并行推进多首歌：/studio → 老周作 orchestrator，活派后台 subagent，
+  主理人只在决策点拍板（跨歌错峰编排，spec 见 2026-05-17-cross-song-orchestration.md）
 ```
 
 完整设计见 `docs/superpowers/specs/2026-05-02-music-studio-design.md`。
@@ -59,6 +62,7 @@
 |---|---|
 | `/new-song` | `.claude/commands/new-song.md` |
 | `/make-video` | `.claude/commands/make-video.md` |
+| `/studio` | `.claude/commands/studio.md` |
 | `/songbook` | `.claude/commands/songbook.md` |
 | `/done` | `.claude/commands/done.md` |
 | `/review` | `.claude/commands/review.md` |
@@ -102,3 +106,4 @@
 - 自治程度：autopilot；保留一票否决权
 - 探索/收敛：mode 是 advisory 字段，画像选择永远由题材决定（不强制 80/20）
 - 外部服务：手动衔接，RUN.md 给清单
+- 长任务执行：预计 >30 秒的任务默认后台跑（`run_in_background`），不前台阻塞主理人；主理人可在等待期切去推别的歌/MV
