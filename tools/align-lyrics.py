@@ -51,6 +51,7 @@ ENCODING = 134
 # 卡拉OK模式（完整 MV 演唱版用 --karaoke）
 KARAOKE_SUNG = "&H00FFFFFF"    # 已唱=白
 KARAOKE_UNSUNG = "&H00B0B0B0"  # 未唱=灰
+KARAOKE_LEAD = 0.30            # 卡拉OK字幕整体提前量（盖入场动效耗时，避免观感偏晚）
 
 DEFAULT_LEAD_IN = 0.2  # 与 cut-chorus.py 同步
 
@@ -279,9 +280,11 @@ def write_ass_karaoke(segments: list, ass_out: Path, font: str,
         for i, c in enumerate(chars):
             d = base if i < n - 1 else dur_cs - base * (n - 1)
             k.append(f"{{\\kf{max(d, 1)}}}{c}")
+        s = max(0.0, seg["start"] - KARAOKE_LEAD)
+        e = max(0.0, seg["end"] - KARAOKE_LEAD)
         lines.append(
-            f"Dialogue: 0,{fmt_ass_time(seg['start'])},"
-            f"{fmt_ass_time(seg['end'])},K,,0,0,0,,{entrance}{''.join(k)}\n"
+            f"Dialogue: 0,{fmt_ass_time(s)},"
+            f"{fmt_ass_time(e)},K,,0,0,0,,{entrance}{''.join(k)}\n"
         )
     ass_out.write_text("".join(lines), encoding="utf-8")
 
