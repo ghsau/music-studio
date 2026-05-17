@@ -268,17 +268,23 @@ def write_ass_karaoke(segments: list, ass_out: Path, font: str,
         "Effect, Text\n"
     )
     entrance = "{\\fad(140,0)\\fscx82\\fscy82\\t(0,220,\\fscx100\\fscy100)}"
+    # 全局匀速扫光：扫光速度 = 全曲平均字/秒；单句扫光时长 = 字数/速率，且不超过该句 cue 时长。
+    # 字唱完扫光即停、之后保持满色，避免"人闭嘴了字幕还在滚"（cue 末尾常含人声唱完后的间隙）。
+    total_chars = sum(len(s["text"].replace("\n", "")) for s in segments) or 1
+    total_dur = sum(max(0.001, s["end"] - s["start"]) for s in segments)
+    rate = total_chars / total_dur  # 字/秒
     lines = [header]
     for seg in segments:
         chars = list(seg["text"].replace("\n", ""))
         n = len(chars)
         if n == 0:
             continue
-        dur_cs = int(round((seg["end"] - seg["start"]) * 100))
-        base = dur_cs // n
+        cue_cs = int(round((seg["end"] - seg["start"]) * 100))
+        sweep_cs = min(int(round(n / rate * 100)), cue_cs)
+        base = sweep_cs // n
         k = []
         for i, c in enumerate(chars):
-            d = base if i < n - 1 else dur_cs - base * (n - 1)
+            d = base if i < n - 1 else sweep_cs - base * (n - 1)
             k.append(f"{{\\kf{max(d, 1)}}}{c}")
         s = max(0.0, seg["start"] - KARAOKE_LEAD)
         e = max(0.0, seg["end"] - KARAOKE_LEAD)
