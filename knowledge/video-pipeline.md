@@ -3,6 +3,8 @@
 > 抖音视频制作。一个子系统 = **共用底座 + 3 条生成路径**。
 > 完整设计见 `docs/superpowers/specs/2026-05-17-video-subsystem.md`。
 >
+> **本文件只管技术管线（怎么造出来）**。创作手艺（hook / 剪辑节奏 / 情绪曲线 / 完播率工程——做成什么样有人看完）见 `knowledge/mv-craft.md`，抖叔做任何 MV 前必读。
+>
 > **视频是发布后的可选步骤**——不是做歌主线门槛。歌做完（词/曲/封面/发布包）即 `package_ready`；要做视频，发布前后跑 `/make-video <曲名>`。
 >
 > **个人实战记录**（具体歌名 + 接续点 + 待优化点）记录在 `notes/video-pipeline-notes.md`，不入 git。

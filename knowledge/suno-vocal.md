@@ -2,6 +2,8 @@
 
 > 由阿声读写。Suno 的人声控制不稳定，本库重点记录"已知有效"和"翻车"模板。
 >
+> **本库管 g2p / 多音字 / 双版本歌词（让 Suno 念对字）**。音色辨识度（具体质感词、Suno Persona 签名声音、按画像分签名声音）见 `knowledge/vocal-identity.md` —— 阿声写人声指示前两库都必读。
+>
 > **个人验证归因**（具体歌名 + 日期 + 数据快照）记录在 `notes/suno-vocal-attribution.md`，不入 git。
 
 ## 已验证

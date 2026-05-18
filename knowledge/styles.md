@@ -22,6 +22,7 @@
 - **调性**：小调（A minor / D minor 优先）
 - **意象类型**：国风传统 → 必读 `knowledge/guofeng-imagery.md`
 - **人声**：女气声 / 男 baritone（叙述感）
+- **签名声音 / Suno Persona**：`[待主理人在 Suno 创建后回填 Persona 名/ID]` | 目标音色定位：女气声空灵（breathy ethereal female）/ 男颗粒叙述 baritone（gravelly intimate baritone）—— 缠绵沉静、历史厚重。详见 `knowledge/vocal-identity.md`
 - **编曲**：古筝/笛子主导 + 弦乐铺底 + 副歌可加 cinematic strings
 - **情绪光谱**：缠绵 / 沉静 / 历史厚重
 - **抖音 hook 模式**：物寄情 / 时间切片（参 `knowledge/douyin-hooks.md`）
@@ -38,6 +39,7 @@
 - **调性**：大调（D major / G major 优先）
 - **意象类型**：国风传统 + 现代具象混合
 - **人声**：女清亮 / 男温暖中音（可带沙哑）
+- **签名声音 / Suno Persona**：`[待主理人在 Suno 创建后回填 Persona 名/ID]` | 目标音色定位：女清亮通透（bright clear female）/ 男温暖中音带微沙（warm male, slight rasp）—— 温暖治愈、抓耳。详见 `knowledge/vocal-identity.md`
 - **编曲**：钢琴节奏型 + 木吉他扫弦 + 鼓 + 弦乐升华，国风乐器作点缀
 - **情绪光谱**：温暖 / 治愈 / 觉悟释然
 - **抖音 hook 模式**：反差对照 / 时间切片 / 数字感
@@ -54,6 +56,7 @@
 - **调性**：小调或大调皆可，按情绪
 - **意象类型**：**现代具象优先**（电话 / 银行卡 / 通勤 / 便利店 / 地铁 / 加班 / 亲子日常）—— 不强求国风
 - **人声**：男声温暖中音 + 内敛叙述（close-mic intimate） / 女声叙事感
+- **签名声音 / Suno Persona**：`[待主理人在 Suno 创建后回填 Persona 名/ID]` | 目标音色定位：男烟嗓颗粒中音 + 内敛叙述（smoky gravelly male baritone, conversational close-mic）/ 女叙事感 —— 克制、中年清醒。**本画像最该用足质感词**，毛不易/宋冬野辨识度全在音色质感。详见 `knowledge/vocal-identity.md`
 - **编曲**：钢琴主导 + 大提琴 / 木吉他指弹，可极简（无鼓）
 - **情绪光谱**：克制 / 想哭哭不出来 / 中年清醒
 - **抖音 hook 模式**：留白式 / 直问式 / 倒叙式
@@ -76,11 +79,14 @@
 
 ### 画像 4：中文说唱  `[chinese-rap]`  🧪
 
+> **跑此画像必读 `knowledge/rap.md`**——rap 硬知识库（flow 体系 / 押韵体系 / punchline 构造 / 中文说唱的坑 / benchmark 拆解）。墨九写词、阿声写 prompt 前都先读完，按其中体系创作，不许凭本能。
+
 - **押韵**：Verse rap **严格押**（rap 是押韵核心流派）/ Chorus 视情况（半押或留白皆可）
 - **BPM**：60–130（覆盖范围；具体由子变体定）
 - **调性**：大调小调皆可，按情绪
 - **意象类型**：**现代具象 + 自传性日常**（电话 / 房间灯下 / 城市夜 / 口头禅 / 通勤 / 工位）—— 不读 guofeng-imagery
 - **人声**：男/女 **rap flow + 副歌可加 melodic singing**（同一人声两种切换是常见结构）
+- **签名声音 / Suno Persona**：`[待主理人在 Suno 创建后回填 Persona 名/ID]` | 目标音色定位：男温暖中音 rap flow + 副歌 melodic（warm male, conversational rap delivery）—— 柔情向偏 husky 自陈，快嘴向偏 raw gritty 痛快。详见 `knowledge/vocal-identity.md`
 - **编曲**：节奏型 + 鼓机 + 至少 1 种主乐器（钢琴 / 电子 / 合成）；具体由子变体定
 - **情绪光谱**：温柔自陈 / 痛快直说 / 戏谑 / 燃 —— 范围广，子变体细分
 - **抖音 hook 模式**：金句式（rap 段 punchline）/ 节奏点式（卡 808 重拍）
@@ -116,6 +122,7 @@
 - **调性**：小调 funky 或大调明朗（C# minor / D major / G major 优先）
 - **意象类型**：**现代日常 + 童趣 + 口头禅 / 家庭场景 / 派对** —— 偏轻松题材，不读 guofeng-imagery
 - **人声**：男女声皆可，**副歌人声叠加 + 童声哼鸣点缀**（APT 的 ROSÉ + Bruno 男女混结构是这画像 signature，但 Suno 男女混不稳，单声 + doubled vocal harmony 替代）
+- **签名声音 / Suno Persona**：`[待主理人在 Suno 创建后回填 Persona 名/ID]` | 目标音色定位：清亮明朗 + doubled vocal harmony（bright punchy vocal, layered）—— 明亮度优先，抓耳跟唱。详见 `knowledge/vocal-identity.md`
 - **编曲**：disco-funk 鼓 + funky bass + synth 和弦 + 钢琴和弦 + 偶尔轻 808；**关键是 groovy bass line + 4-on-the-floor kick**
 - **情绪光谱**：派对快乐 / 戏精反差 / 跟唱性 max / 轻松俏皮
 - **抖音 hook 模式**：**重复洗脑式（3+1 切分）/ 短词反复 / 数字感**（APT 是 "APT × 3 + 变化"，中文版可走 "字 × 3 + 反转"）
@@ -137,6 +144,7 @@
 | 调性偏好 | 阿声 | Key 字段 |
 | 意象类型 + 库引用 | 观山 + 墨九 | 读哪本意象库 |
 | 人声 | 阿声 | 性别 + 气质 |
+| 签名声音 / Suno Persona | 阿声 | 该画像锁定的 Suno Persona（跨歌一致的"高爽的声音"）+ 目标音色定位；详见 `knowledge/vocal-identity.md` |
 | 编曲 | 阿声 | 主导乐器 + 节奏感 |
 | 情绪光谱 | 观山 + 青衫 | brief 调性 + 视觉调子 |
 | 抖音 hook 模式 | 抖叔 + 小汽 | 切片 + 评论钩子选哪类模板 |
@@ -182,6 +190,7 @@
 2. 老周从灵感倒推 8 字段
 3. 字段填不准的位置写 `[待实测]`，跑首歌后回填
 4. 整体标 🧪
+5. **「签名声音 / Suno Persona」字段必填目标音色定位**（Persona 名/ID 留 `[待回填]`，主理人首跑后在 Suno 创建并回填）；目标音色定位参 `knowledge/vocal-identity.md` 板块 1 选词
 
 ## 升级 🧪 → ✅ 的标准
 

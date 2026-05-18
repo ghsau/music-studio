@@ -14,6 +14,7 @@
 - **必读**：`knowledge/styles.md` 中本曲对应画像的完整段
 - **必读**：`knowledge/suno-vocal.md`（多音字 + 低频字防御策略）
 - **画像 = 国风系（slow-lyric / pop）时必读**：`knowledge/guofeng-imagery.md`、`knowledge/guofeng-rhyme.md`
+- **画像 = `chinese-rap` 时必读**：`knowledge/rap.md`（rap 硬知识库 — flow / 押韵 / punchline / 中文说唱的坑 / benchmark）。**做 rap 类歌曲前必须先读完本文件**，按其中的 flow / 押韵 / punchline 体系写词，不许凭本能押韵
 - **画像 = 现代叙事系时**：`guofeng-*` 库**改为选读**或不读，按画像的"意象类型"字段决定意象走向
 - **必读**（converge 模式下）：`knowledge/douyin-hooks.md`
 - **选读**：项目中已有内容（如重写时）
@@ -30,6 +31,7 @@
   - `guofeng-slow-lyric`：严格押韵 + 国风意象 + 抒情慢板气质
   - `guofeng-pop`：押韵但允许半押 + 国风+现代混合意象 + 明朗气质
   - `modern-narrative-folk`：**彻底放弃押韵** + 现代具象意象 + 口语真实感（参考毛不易《消愁》、宋冬野《董小姐》、陈鸿宇《理想三旬》）
+  - `chinese-rap`：**写词前先读完 `knowledge/rap.md`**——按 bar 排字数和停顿、按 flow 类型（boom-bap / trap / 三连音 / double-time）写、逐字判定单/双押不许误报、至少设计 1 个 setup→punch 的 punchline；押韵服务内容不为韵害意
   - 跨画像（主+副）：主参数取主画像，意象/手法可叠加副画像
 - **意象优先于押韵**：宁可换韵也不用错意象。**国风画像也不押韵硬凑**
 - **押韵不是天职**：押韵是流派惯例，不是音乐法律。题材真实和押韵冲突时——**真实优先**
