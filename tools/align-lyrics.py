@@ -198,16 +198,18 @@ def fmt_ass_time(secs: float) -> str:
     return f"{h}:{m:02d}:{s:05.2f}"
 
 
-def write_ass(segments: list, ass_out: Path, font: str, font_size: int):
-    print(f"[字幕] 生成 → {ass_out.name}")
+def write_ass(segments: list, ass_out: Path, font: str, font_size: int,
+              video_w: int, video_h: int):
+    margin_v = round(video_h * 0.33)        # 上移避开抖音底部描述区 + 评论/按钮区（0.27→0.33，2026-05-18 实测仍被挡）
+    print(f"[字幕] 生成 → {ass_out.name}（PlayRes {video_w}×{video_h}，MarginV {margin_v}）")
     header = (
         "[Script Info]\n"
         "Title: lyrics\n"
         "ScriptType: v4.00+\n"
         "WrapStyle: 0\n"
         "ScaledBorderAndShadow: yes\n"
-        "PlayResX: 1080\n"
-        "PlayResY: 1920\n"
+        f"PlayResX: {video_w}\n"
+        f"PlayResY: {video_h}\n"
         "\n"
         "[V4+ Styles]\n"
         "Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, "
@@ -216,7 +218,7 @@ def write_ass(segments: list, ass_out: Path, font: str, font_size: int):
         "Alignment, MarginL, MarginR, MarginV, Encoding\n"
         f"Style: Default,{font},{font_size},{PRIMARY_COLOR},&H000000FF,"
         f"{OUTLINE_COLOR},{BACK_COLOR},-1,0,0,0,100,100,2,0,1,"
-        f"{DEFAULT_OUTLINE},2,2,80,80,{DEFAULT_MARGIN_V},{ENCODING}\n"
+        f"{DEFAULT_OUTLINE},2,2,80,80,{margin_v},{ENCODING}\n"
         "\n"
         "[Events]\n"
         "Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, "
@@ -243,7 +245,7 @@ def write_ass_karaoke(segments: list, ass_out: Path, font: str,
     """
     print(f"[字幕] 生成卡拉OK ASS → {ass_out.name}（PlayRes {video_w}×{video_h}）")
     fs = font_size or round(video_h * 0.055)
-    margin_v = round(video_h * 0.27)        # 上移避开抖音底部描述区
+    margin_v = round(video_h * 0.33)        # 上移避开抖音底部描述区 + 评论/按钮区（0.27→0.33，2026-05-18 实测仍被挡）
     outline = max(2, round(video_h * 0.0025))
     header = (
         "[Script Info]\n"
@@ -414,7 +416,8 @@ def main():
             fs = args.font_size if args.font_size != DEFAULT_FONT_SIZE else None
             write_ass_karaoke(segments, ass_file, args.font, vw, vh, fs)
         else:
-            write_ass(segments, ass_file, args.font, args.font_size)
+            vw, vh = get_video_dimensions(args.input_video)
+            write_ass(segments, ass_file, args.font, args.font_size, vw, vh)
         burn_subtitles(args.input_video, ass_file, args.output, args.fonts_dir)
 
         if args.keep_intermediate:
